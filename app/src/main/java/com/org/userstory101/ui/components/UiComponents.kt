@@ -26,7 +26,6 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -52,7 +51,6 @@ import com.org.userstory101.ui.theme.h3_black
 import com.org.userstory101.ui.theme.h4_bold
 import com.org.userstory101.ui.theme.h6_black
 import com.org.userstory101.ui.theme.h6_bold
-import com.org.userstory101.ui.theme.h7_black
 import com.org.userstory101.ui.theme.h7_bold
 import com.org.userstory101.ui.theme.h8_black
 import com.org.userstory101.utils.Constants
@@ -217,66 +215,65 @@ fun BottomNavBar(modifier: Modifier = Modifier, navController: NavController) {
 }
 
 @Composable
-fun PopUpDialog(modifier: Modifier = Modifier, onClick: () -> Unit) {
-    Surface(
-        modifier = modifier
-            .fillMaxSize()
-            .background(color = Color.Black.copy(alpha = 0.5f))
+fun PopUpDialog(modifier: Modifier = Modifier, onClick: () -> Unit = {}) {
+    Column(
+        modifier
+            .fillMaxWidth()
+            .wrapContentHeight()
+            .clip(shape = RoundedCornerShape(12.dp))
+            .background(Color.White),
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Column(
-            modifier
+        Spacer(modifier = modifier.height(16.dp))
+        Row(
+            horizontalArrangement = Arrangement.Start,
+            modifier = modifier
                 .fillMaxWidth()
-                .wrapContentHeight()
-                .clip(shape = RoundedCornerShape(12.dp)),
-            horizontalAlignment = Alignment.CenterHorizontally
+                .padding(start = 20.dp, end = 20.dp)
         ) {
-            Spacer(modifier = modifier.height(16.dp))
-            Row(
-                horizontalArrangement = Arrangement.Start,
-                modifier = modifier
-                    .fillMaxWidth()
-                    .padding(start = 20.dp, end = 20.dp)
-            ) {
-                Text(text = "Your Gateway to Convenience!", style = h4_bold, color = GreenA)
-                Spacer(modifier = modifier.width(70.dp))
-                Icon(
-                    painter = painterResource(id = R.drawable.cross_small),
-                    contentDescription = "Cancel",
-                    modifier = modifier.clickable { onClick() }
-                )
-            }
-            Spacer(modifier = modifier.height(16.dp))
-            Card(
-                modifier
-                    .height(200.dp)
-                    .fillMaxWidth()
-                    .padding(start = 20.dp, end = 20.dp)
-            ) {
-                Image(
-                    painter = painterResource(id = R.drawable.interior_photo),
-                    contentDescription = null,
-                    modifier = modifier.fillMaxWidth(),
-                    contentScale = ContentScale.FillBounds
-                )
-            }
-            Spacer(modifier = modifier.height(16.dp))
             Text(
-                text = "Explore the world of locker services with HubLocker",
-                modifier = modifier
-                    .fillMaxWidth()
-                    .padding(start = 20.dp),
-                style = h4_bold
+                text = "Your Gateway to Convenience!",
+                style = h4_bold,
+                color = GreenA
             )
-            Spacer(modifier = modifier.height(16.dp))
-            Text(
-                text = "Learn how locker services work",
-                modifier = modifier
-                    .fillMaxWidth()
-                    .padding(start = 20.dp),
-                style = h6_black
+            Spacer(modifier = modifier.width(70.dp))
+            Icon(
+                painter = painterResource(id = R.drawable.cross_small),
+                contentDescription = "Cancel",
+                modifier = modifier.clickable { }
             )
-            Spacer(modifier = modifier.height(16.dp))
         }
+        Spacer(modifier = modifier.height(16.dp))
+        Card(
+            modifier
+                .height(200.dp)
+                .fillMaxWidth()
+                .padding(start = 20.dp, end = 20.dp)
+        ) {
+            Image(
+                painter = painterResource(id = R.drawable.interior_photo),
+                contentDescription = null,
+                modifier = modifier.fillMaxWidth(),
+                contentScale = ContentScale.FillBounds
+            )
+        }
+        Spacer(modifier = modifier.height(16.dp))
+        Text(
+            text = "Explore the world of locker services with HubLocker",
+            modifier = modifier
+                .fillMaxWidth()
+                .padding(start = 20.dp),
+            style = h4_bold
+        )
+        Spacer(modifier = modifier.height(16.dp))
+        Text(
+            text = "Learn how locker services work",
+            modifier = modifier
+                .fillMaxWidth()
+                .padding(start = 20.dp),
+            style = h6_black
+        )
+        Spacer(modifier = modifier.height(16.dp))
     }
 }
 
@@ -356,26 +353,38 @@ fun Chip(modifier: Modifier = Modifier, isDelivered: Boolean = true, text: Strin
 }
 
 @Composable
-fun ChipFilter(modifier: Modifier = Modifier, text: String) {
+fun ChipFilter(modifier: Modifier = Modifier, text: String, onSelectedChange: (Boolean) -> Unit) {
+    var selected by remember {
+        mutableStateOf(false)
+    }
     Card(
         shape = CircleShape,
         border = BorderStroke(width = 1.dp, color = Color.Gray),
         modifier = modifier
             .wrapContentWidth()
             .height(40.dp)
+            .clickable {
+                selected = !selected
+            }
     ) {
         Row(
             horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically,
             modifier = modifier
                 .clip(CircleShape)
-                .background(color = Color.White)
+                .background(color = if (selected) GreenA else Color.White)
         ) {
             Spacer(modifier = modifier.width(20.dp))
-            Text(text = text, modifier = modifier.padding(10.dp), style = h7_bold)
+            Text(
+                text = text,
+                modifier = modifier.padding(10.dp),
+                style = h7_bold,
+                color = if (selected) Color.White else GreenA
+            )
             Spacer(modifier = modifier.width(20.dp))
         }
     }
+    onSelectedChange(selected)
 }
 
 @Composable
@@ -452,18 +461,22 @@ fun CustomDialogDemo(modifier: Modifier = Modifier, showDialog: Boolean) {
                         modifier
                             .fillMaxWidth()
                             .wrapContentHeight()
-                            .clip(shape = RoundedCornerShape(12.dp)).background(Color.White),
+                            .clip(shape = RoundedCornerShape(12.dp))
+                            .background(Color.White),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         Spacer(modifier = modifier.height(16.dp))
                         Row(
-                            horizontalArrangement = Arrangement.Start,
+                            horizontalArrangement = Arrangement.SpaceEvenly,
                             modifier = modifier
                                 .fillMaxWidth()
                                 .padding(start = 20.dp, end = 20.dp)
                         ) {
-                            Text(text = "Your Gateway to Convenience!", style = h4_bold, color = GreenA)
-                            Spacer(modifier = modifier.width(70.dp))
+                            Text(
+                                text = "Your Gateway to Convenience!",
+                                style = h4_bold,
+                                color = GreenA
+                            )
                             Icon(
                                 painter = painterResource(id = R.drawable.cross_small),
                                 contentDescription = "Cancel",
@@ -516,6 +529,6 @@ private fun Check() {
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        CustomDialogDemo(showDialog = true)
+        PopUpDialog()
     }
 }

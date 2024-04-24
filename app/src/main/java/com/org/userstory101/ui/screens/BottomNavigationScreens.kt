@@ -48,6 +48,10 @@ import androidx.compose.ui.window.Dialog
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.org.userstory101.R
+import com.org.userstory101.data.Q1
+import com.org.userstory101.data.Q2
+import com.org.userstory101.data.Q3
+import com.org.userstory101.data.updateFilters
 import com.org.userstory101.ui.components.Benefits
 import com.org.userstory101.ui.components.BottomNavBar
 import com.org.userstory101.ui.components.Button
@@ -56,7 +60,6 @@ import com.org.userstory101.ui.components.Chip
 import com.org.userstory101.ui.components.ChipFilter
 import com.org.userstory101.ui.components.CustomTopBar
 import com.org.userstory101.ui.components.PackageButton
-import com.org.userstory101.ui.components.PopUpDialog
 import com.org.userstory101.ui.navigation.NavigationRoute
 import com.org.userstory101.ui.theme.GreenA
 import com.org.userstory101.ui.theme.h4_bold
@@ -68,13 +71,27 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LockerScreen(modifier: Modifier = Modifier, navController: NavController) {
-    var openDialog by remember {
-        mutableStateOf(false)
-    }
+    var openDialog by remember { mutableStateOf(false) }
     val sheetState = rememberModalBottomSheetState()
+    var isButtonClicked by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
-
     var isVisible by remember { mutableStateOf(true) }
+    var selectedFilters by remember { mutableStateOf(emptyList<String>()) }
+    var showPending by remember { mutableStateOf(true) }
+    var showDelivered by remember { mutableStateOf(true) }
+
+    var filteredItems: List<Triple<Float, Float, String>>? = Q1 + Q2 + Q3
+
+    if (isButtonClicked) {
+        filteredItems = remember(selectedFilters) {
+            when {
+                selectedFilters.contains("Q1") -> Q1
+                selectedFilters.contains("Q2") -> Q2
+                selectedFilters.contains("Q3") -> Q3
+                else -> emptyList()
+            }
+        }
+    }
 
     LaunchedEffect(Unit) {
         delay(6000)
@@ -117,33 +134,54 @@ fun LockerScreen(modifier: Modifier = Modifier, navController: NavController) {
                         Text(text = "Year")
                         Spacer(modifier = modifier.height(20.dp))
                         Row {
-                            ChipFilter(text = "2024")
+                            ChipFilter(text = "2024") {}
                             Spacer(modifier = modifier.width(20.dp))
-                            ChipFilter(text = "2023")
+                            ChipFilter(text = "2023") {}
                         }
                         Spacer(modifier = modifier.height(20.dp))
                         Text(text = "Quarterly")
                         Spacer(modifier = modifier.height(20.dp))
                         Row(modifier = modifier.horizontalScroll(rememberScrollState())) {
-                            ChipFilter(text = "Q1")
+                            ChipFilter(text = "Q1") { selected ->
+                                updateFilters("Q1", selected, selectedFilters) {
+                                    selectedFilters = it
+                                }
+                            }
                             Spacer(modifier = modifier.width(20.dp))
-                            ChipFilter(text = "Q2")
+                            ChipFilter(text = "Q2") { selected ->
+                                updateFilters("Q2", selected, selectedFilters) {
+                                    selectedFilters = it
+                                }
+                            }
                             Spacer(modifier = modifier.width(20.dp))
-                            ChipFilter(text = "Q3")
+                            ChipFilter(text = "Q3") { selected ->
+                                updateFilters("Q3", selected, selectedFilters) {
+                                    selectedFilters = it
+                                }
+                            }
                             Spacer(modifier = modifier.width(20.dp))
-                            ChipFilter(text = "Q4")
+                            ChipFilter(text = "Q4") { selected ->
+                                updateFilters("Q4", selected, selectedFilters) {
+                                    selectedFilters = it
+                                }
+                            }
                         }
                         Spacer(modifier = modifier.height(20.dp))
                         Text(text = "Package Summary")
                         Spacer(modifier = modifier.height(20.dp))
                         Row(modifier = modifier.horizontalScroll(rememberScrollState())) {
-                            ChipFilter(text = "Delivered packages")
+                            ChipFilter(text = "Delivered packages") { selected ->
+                                showPending = selected
+                            }
                             Spacer(modifier = modifier.width(20.dp))
-                            ChipFilter(text = "Pending packages")
+                            ChipFilter(text = "Pending packages") { selected ->
+                                showDelivered = selected
+                            }
                             Spacer(modifier = modifier.width(20.dp))
                         }
                         Spacer(modifier = modifier.height(40.dp))
                         Button(text = "Save") {
+                            isButtonClicked = true
                             scope.launch { sheetState.hide() }.invokeOnCompletion {
                                 if (!sheetState.isVisible) {
                                     openDialog = false
@@ -162,18 +200,22 @@ fun LockerScreen(modifier: Modifier = Modifier, navController: NavController) {
                             modifier
                                 .fillMaxWidth()
                                 .wrapContentHeight()
-                                .clip(shape = RoundedCornerShape(12.dp)).background(Color.White),
+                                .clip(shape = RoundedCornerShape(12.dp))
+                                .background(Color.White),
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
                             Spacer(modifier = modifier.height(16.dp))
                             Row(
-                                horizontalArrangement = Arrangement.Start,
+                                horizontalArrangement = Arrangement.SpaceEvenly,
                                 modifier = modifier
                                     .fillMaxWidth()
                                     .padding(start = 20.dp, end = 20.dp)
                             ) {
-                                Text(text = "Your Gateway to Convenience!", style = h4_bold, color = GreenA)
-                                Spacer(modifier = modifier.width(70.dp))
+                                Text(
+                                    text = "Your Gateway to Convenience!",
+                                    style = h4_bold,
+                                    color = GreenA
+                                )
                                 Icon(
                                     painter = painterResource(id = R.drawable.cross_small),
                                     contentDescription = "Cancel",
@@ -258,22 +300,24 @@ fun LockerScreen(modifier: Modifier = Modifier, navController: NavController) {
                 Text(text = "Q1-Q3", style = h7_black)
                 Spacer(modifier = modifier.height(16.dp))
                 Row {
-                    Chip(text = "Delivered packages")
+                    if (showDelivered) {
+                        Chip(text = "Delivered packages")
+                        Spacer(modifier = modifier.width(16.dp))
+                    }
                     Spacer(modifier = modifier.width(16.dp))
-                    Chip(text = "Pending packages", isDelivered = false)
+                    if (showPending) {
+                        Chip(text = "Pending packages", isDelivered = false)
+                    }
                 }
                 Spacer(modifier = modifier.height(30.dp))
                 Row(modifier = modifier.horizontalScroll(rememberScrollState())) {
-                    Chart(
-                        data = listOf(
-                            Triple(0.5f, 0.2f, "Jan"),
-                            Triple(0.6f, 0.3f, "Feb"),
-                            Triple(0.2f, 0.5f, "Mar"),
-                            Triple(0.7f, 0.4f, "Apr"),
-                            Triple(0.8f, 0.6f, "May"),
-
-                            ), max_value = 6000
-                    )
+                    if (filteredItems != null) {
+                        Chart(
+                            data = filteredItems, max_value = 6000,
+                            delivered = showDelivered,
+                            pending = showPending
+                        )
+                    }
                 }
                 Spacer(modifier = modifier.height(20.dp))
                 PackageButton(
@@ -295,7 +339,13 @@ fun LockerScreen(modifier: Modifier = Modifier, navController: NavController) {
 
 @Composable
 fun RentScreen(modifier: Modifier = Modifier, navController: NavController) {
-
+    Scaffold(
+        content = {
+            Column(modifier = modifier.padding(it)) {
+            }
+        },
+        bottomBar = { BottomNavBar(navController = navController) }
+    )
 }
 
 @Composable
@@ -357,7 +407,13 @@ fun ProductScreen(modifier: Modifier = Modifier, navController: NavController) {
                 Icon(imageVector = Icons.Default.Close, contentDescription = "")
             }
         }
-        Column(modifier = modifier.padding(start = 24.dp, end = 24.dp)) {
+        Column(
+            modifier = modifier
+                .padding(start = 24.dp, end = 24.dp)
+                .verticalScroll(
+                    rememberScrollState()
+                )
+        ) {
             Spacer(modifier = modifier.height(20.dp))
             Text(text = "Introduction", style = h4_bold)
             Spacer(modifier = modifier.height(16.dp))

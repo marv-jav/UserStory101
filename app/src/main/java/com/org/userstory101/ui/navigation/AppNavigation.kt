@@ -15,22 +15,22 @@ import com.org.userstory101.ui.screens.RentScreen
 fun AppNavigation() {
     val navController = rememberNavController()
     NavHost(navController = navController, startDestination = NavigationRoute.ProductScreen.name) {
-        composable(NavigationRoute.LockerScreen.name){
+        composable(NavigationRoute.LockerScreen.name) {
             LockerScreen(navController = navController)
         }
-        composable(NavigationRoute.HomeScreen.name){
+        composable(NavigationRoute.HomeScreen.name) {
             HomeScreen(navController = navController)
         }
-        composable(NavigationRoute.RentScreen.name){
+        composable(NavigationRoute.RentScreen.name) {
             RentScreen(navController = navController)
         }
-        composable(NavigationRoute.AccountScreen.name){
+        composable(NavigationRoute.AccountScreen.name) {
             AccountScreen(navController = navController)
         }
-        composable(NavigationRoute.AdvertScreen.name){
+        composable(NavigationRoute.AdvertScreen.name) {
             AdvertScreen(navController = navController)
         }
-        composable(NavigationRoute.ProductScreen.name){
+        composable(NavigationRoute.ProductScreen.name) {
             ProductScreen(navController = navController)
         }
     }

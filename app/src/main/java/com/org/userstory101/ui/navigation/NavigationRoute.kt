@@ -9,7 +9,7 @@ enum class NavigationRoute {
     ProductScreen;
 
     companion object {
-        fun fromRoute(route: String?): NavigationRoute = when(route) {
+        fun fromRoute(route: String?): NavigationRoute = when (route) {
             HomeScreen.name -> HomeScreen
             LockerScreen.name -> LockerScreen
             RentScreen.name -> RentScreen

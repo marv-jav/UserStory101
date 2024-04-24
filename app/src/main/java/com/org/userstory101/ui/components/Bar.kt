@@ -29,13 +29,13 @@ import com.org.userstory101.ui.theme.GreenA
 import com.org.userstory101.ui.theme.RedA
 
 
-data class MyData(val float1: Float, val float2: Float, val month: String)
-
 @Composable
 fun Chart(
     data: List<Triple<Float, Float, String>>,
     max_value: Int,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    delivered: Boolean = true,
+    pending: Boolean = true
 ) {
     val context = LocalContext.current
     // BarGraph Dimensions
@@ -114,7 +114,6 @@ fun Chart(
                 }
 
             }
-
             // Y-Axis Line
             Box(
                 modifier = Modifier
@@ -122,34 +121,36 @@ fun Chart(
                     .width(scaleLineWidth)
                     .background(Color.Black)
             )
-
             // graph
             data.forEach() {
                 Row {
                     Spacer(modifier = modifier.padding(start = barGraphWidth))
-                    Box(
-                        modifier = Modifier
-                            .align(Alignment.Bottom)
-                            .width(barGraphWidth)
-                            .fillMaxHeight(it.first)
-                            .background(GreenA)
-                            .clickable {
-                            }
-                    )
-                    Box(
-                        modifier = Modifier
-                            .align(Alignment.Bottom)
-                            .width(barGraphWidth)
-                            .fillMaxHeight(it.second)
-                            .background(RedA)
-                            .clickable {
-                            }
-                    )
+                    if (delivered) {
+                        Box(
+                            modifier = Modifier
+                                .align(Alignment.Bottom)
+                                .width(barGraphWidth)
+                                .fillMaxHeight(it.first)
+                                .background(GreenA)
+                                .clickable {
+                                }
+                        )
+                    }
+                    if (pending) {
+                        Box(
+                            modifier = Modifier
+                                .align(Alignment.Bottom)
+                                .width(barGraphWidth)
+                                .fillMaxHeight(it.second)
+                                .background(RedA)
+                                .clickable {
+                                }
+                        )
+                    }
                 }
             }
 
         }
-
         // X-Axis Line
         Box(
             modifier = Modifier
@@ -157,7 +158,6 @@ fun Chart(
                 .height(scaleLineWidth)
                 .background(Color.Black)
         )
-
         // Scale X-Axis
         Row(
             modifier = Modifier
